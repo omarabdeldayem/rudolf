@@ -1,19 +1,38 @@
 use ndarray::prelude::*;
 
-fn update(x: ArrayView1<u32>, u: ArrayView1<u32>) -> std::io::Result<()> {
-    Ok(())
+struct State<T: ::ndarray::RawData, D> {
+    mean: Array1<T>,
+    cov: ArrayBase<T, D>,
 }
 
-fn predict() -> std::io::Result<()> {
-    Ok(())
+struct Noise<T: ::ndarray::RawData, D> {
+    measurement: ArrayBase<T, D>,
+    process: ArrayBase<T, D>,
+}
+
+struct KalmanFilter<T: ::ndarray::RawData, D> {
+    init_state: State<T, D>,
+    trans: ArrayBase<T, D>,
+    obs: ArrayBase<T, D>,
+    noise: Noise<T, D>,
+}
+
+impl<T: ::ndarray::RawData, D> KalmanFilter<T, D> {
+    fn update(state: State<T, D>) {
+
+    }
+}
+
+impl<T: ::ndarray::RawData, D> State<T, D> {
+    fn filter(kf: KalmanFilter<T, D>) {
+
+    }
 }
 
 fn main() {
-    let a = array![1, 2, 3];
-    let b = array![4, 5, 6];
-    let c = update(a.view(), b.view());
+    let a = array![1.0, 2.0, 3.0];
+    let b = array![4.0, 5.0, 6.0];
 
     println!("{:?}", a);
     println!("{:?}", b);
-    println!("{:?}", c);
 }
