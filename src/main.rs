@@ -1,32 +1,43 @@
 use ndarray::prelude::*;
+use num_traits::Float;
 
-struct State<T: ::ndarray::RawData, D> {
+extern crate num_traits;
+
+struct State<T: Float + 'static> {
     mean: Array1<T>,
-    cov: ArrayBase<T, D>,
+    cov: Array2<T>,
 }
 
-struct Noise<T: ::ndarray::RawData, D> {
-    measurement: ArrayBase<T, D>,
-    process: ArrayBase<T, D>,
+struct Noise<T: Float + 'static> {
+    measurement: Array2<T>,
+    process: Array2<T>,
 }
 
-struct KalmanFilter<T: ::ndarray::RawData, D> {
-    init_state: State<T, D>,
-    trans: ArrayBase<T, D>,
-    obs: ArrayBase<T, D>,
-    noise: Noise<T, D>,
+struct KalmanFilter<T: Float + 'static> {
+    init_state: State<T>,
+    trans: Array2<T>,
+    obs: Array2<T>,
+    noise: Noise<T>,
 }
 
-impl<T: ::ndarray::RawData, D> KalmanFilter<T, D> {
-    fn update(state: State<T, D>) {
+impl<T> KalmanFilter<T>
+where
+    T: Float + 'static,
+{
+    fn update(&self, state: State<T>) {
 
     }
 }
 
-impl<T: ::ndarray::RawData, D> State<T, D> {
-    fn filter(kf: KalmanFilter<T, D>) {
+impl<T> State<T>
+where
+    T: Float + 'static,
+{
 
+    fn filter(self: &mut Self, kf: &KalmanFilter<T>) {
+        self.mean = kf.trans.dot(&self.mean);
     }
+
 }
 
 fn main() {
