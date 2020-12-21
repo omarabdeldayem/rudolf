@@ -1,49 +1,53 @@
-use ndarray::prelude::*;
-use num_traits::Float;
+extern crate nalgebra as na;
 
-extern crate num_traits;
+use na::{RealField, DMatrix, DVector};
 
-struct State<T: Float + 'static> {
-    mean: Array1<T>,
-    cov: Array2<T>,
+struct State<T: RealField> {
+    mean: DVector<T>,
+    cov: DMatrix<T>,
 }
 
-struct Noise<T: Float + 'static> {
-    measurement: Array2<T>,
-    process: Array2<T>,
+struct Noise<T: RealField> {
+    observation: DMatrix<T>,
+    control: DMatrix<T>,
 }
 
-struct KalmanFilter<T: Float + 'static> {
-    init_state: State<T>,
-    trans: Array2<T>,
-    obs: Array2<T>,
+struct Models<T: RealField> {
+    observation: DMatrix<T>,
+    control: DMatrix<T>,
+}
+
+struct KalmanFilter<T: RealField> {
+    state: State<T>,
+    models: Models<T>,
     noise: Noise<T>,
 }
 
 impl<T> KalmanFilter<T>
 where
-    T: Float + 'static,
+    T: RealField,
 {
-    fn update(&self, state: State<T>) {
-
-    }
-}
-
-impl<T> State<T>
-where
-    T: Float + 'static,
-{
-
-    fn filter(self: &mut Self, kf: &KalmanFilter<T>) {
-        self.mean = kf.trans.dot(&self.mean);
+    fn update(&mut self, observation: &DVector<T>) {
+        let inovation: DMatrix<T> = &self.state.cov * &self.models.observation
+            * (&self.models.observation * &self.state.cov * &self.models.observation.transpose()
+                + &self.noise.observation)
+            .try_inverse()
+            .unwrap();
+        self.state.mean = &self.state.mean + (&inovation * (observation - (&self.models.observation * &self.state.mean)));
+        // this needs compile-time dimensional genericity to properly size the identity
+        // self.state.cov = (DMatrix::identity() - &inovation * &self.models.observation) * self.state.cov;
     }
 
+    fn predict(&mut self, control: &DVector<T>) {
+        self.state.mean = (&self.models.observation * &self.state.mean) + (&self.models.control * control);
+        self.state.cov = &self.models.observation * &self.state.cov * &self.models.observation.transpose() + &self.noise.control;
+    }
 }
 
 fn main() {
-    let a = array![1.0, 2.0, 3.0];
-    let b = array![4.0, 5.0, 6.0];
+    // let a = array![1.0, 2.0, 3.0];
+    // let b = array![4.0, 5.0, 6.0];
 
-    println!("{:?}", a);
-    println!("{:?}", b);
+    // println!("{:?}", a);
+    // println!("{:?}", b);
 }
