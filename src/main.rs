@@ -1,7 +1,7 @@
 extern crate nalgebra as na;
 
-use na::{DefaultAllocator, RealField, Dim, DimName, VectorN, MatrixN};
 use na::allocator::Allocator;
+use na::{DefaultAllocator, Dim, DimName, MatrixN, RealField, VectorN};
 
 struct State<T, D>
 where
@@ -51,20 +51,25 @@ where
     DefaultAllocator: Allocator<T, D> + Allocator<T, D, D>,
 {
     fn update(&mut self, observation: &VectorN<T, D>) {
-        let inovation = &self.state.cov * &self.models.observation
+        let inovation = &self.state.cov
+            * &self.models.observation
             * (&self.models.observation * &self.state.cov * &self.models.observation.transpose()
                 + &self.noise.observation)
-            .try_inverse()
-            .unwrap();
-        self.state.mean = &self.state.mean + (&inovation * (observation - (&self.models.observation * &self.state.mean)));
-        self.state.cov = (MatrixN::<T, D>::identity() - &inovation * &self.models.observation) * &self.state.cov;
+                .try_inverse()
+                .unwrap();
+        self.state.mean = &self.state.mean
+            + (&inovation * (observation - (&self.models.observation * &self.state.mean)));
+        self.state.cov =
+            (MatrixN::<T, D>::identity() - &inovation * &self.models.observation) * &self.state.cov;
     }
 
     fn predict(&mut self, control: &VectorN<T, D>) {
-        self.state.mean = (&self.models.observation * &self.state.mean) + (&self.models.control * control);
-        self.state.cov = &self.models.observation * &self.state.cov * &self.models.observation.transpose() + &self.noise.control;
+        self.state.mean =
+            (&self.models.observation * &self.state.mean) + (&self.models.control * control);
+        self.state.cov =
+            &self.models.observation * &self.state.cov * &self.models.observation.transpose()
+                + &self.noise.control;
     }
 }
 
-fn main() {
-}
+fn main() {}
