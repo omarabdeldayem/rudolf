@@ -1,10 +1,10 @@
-extern crate rudolf;
 extern crate nalgebra as na;
+extern crate rudolf;
 
-use na::{Vector3, MatrixN, U3};
+use na::{MatrixN, Vector3, U3};
 // use rudolf::{State, Models, Noise, KalmanFilter};
+use rudolf::core::{Filter, Models, Noise, State};
 use rudolf::filters::kalman::KalmanFilter;
-use rudolf::core::{State, Models, Noise, Filter};
 
 fn main() {
     let mut filter = KalmanFilter::<f32, U3> {
@@ -37,5 +37,4 @@ fn main() {
     filter.update(&new_obs);
 
     println!("{:?}", filter.state.mean);
-
 }
