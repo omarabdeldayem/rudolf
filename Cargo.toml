@@ -8,3 +8,8 @@ edition = "2018"
 
 [dependencies]
 nalgebra = "0.20"
+criterion = "0.3"
+
+[[bench]]
+name = "kalman_3d"
+harness = false

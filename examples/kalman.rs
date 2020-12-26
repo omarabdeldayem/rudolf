@@ -4,7 +4,7 @@ extern crate nalgebra as na;
 use na::{Vector3, MatrixN, U3};
 // use rudolf::{State, Models, Noise, KalmanFilter};
 use rudolf::filters::kalman::KalmanFilter;
-use rudolf::core::{State, Models, Noise};
+use rudolf::core::{State, Models, Noise, Filter};
 
 fn main() {
     let mut filter = KalmanFilter::<f32, U3> {
