@@ -3,6 +3,7 @@ extern crate nalgebra as na;
 use na::allocator::Allocator;
 use na::{DefaultAllocator, Dim, DimName, MatrixN, RealField, VectorN};
 
+#[derive(Debug)]
 pub struct State<T, D>
 where
     T: RealField,
@@ -13,6 +14,7 @@ where
     pub cov: MatrixN<T, D>,
 }
 
+#[derive(Debug)]
 pub struct Noise<T, D>
 where
     T: RealField,
@@ -23,6 +25,7 @@ where
     pub ctrl: MatrixN<T, D>,
 }
 
+#[derive(Debug)]
 pub struct Models<T, D>
 where
     T: RealField,
