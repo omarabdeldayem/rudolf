@@ -1,4 +1,4 @@
-use crate::core::{Filter, Models, Noise, State};
+use crate::core::{Filter, Model, Noise, State};
 
 use na::allocator::Allocator;
 use na::{DefaultAllocator, Dim, DimName, MatrixN, RealField, VectorN};
@@ -11,7 +11,7 @@ where
     DefaultAllocator: Allocator<T, D> + Allocator<T, D, D>,
 {
     pub state: State<T, D>,
-    pub models: Models<T, D>,
+    pub model: Model<T, D>,
     pub noise: Noise<T, D>,
 }
 
@@ -23,20 +23,20 @@ where
 {
 
     fn predict(&mut self, ctrl: &VectorN<T, D>) {
-        self.state.mean = (&self.models.obs * &self.state.mean) + (&self.models.ctrl * ctrl);
+        self.state.mean = (&self.model.obs * &self.state.mean) + (&self.model.ctrl * ctrl);
         self.state.cov =
-            &self.models.obs * &self.state.cov * &self.models.obs.transpose() + &self.noise.ctrl;
+            &self.model.obs * &self.state.cov * &self.model.obs.transpose() + &self.noise.ctrl;
     }
 
     fn update(&mut self, obs: &VectorN<T, D>) {
         let gain = &self.state.cov
-            * &self.models.obs
-            * (&self.models.obs * &self.state.cov * &self.models.obs.transpose() + &self.noise.obs)
+            * &self.model.obs
+            * (&self.model.obs * &self.state.cov * &self.model.obs.transpose() + &self.noise.obs)
                 .try_inverse()
                 .unwrap();
         self.state.mean =
-            &self.state.mean + (&gain * (obs - (&self.models.obs * &self.state.mean)));
-        self.state.cov = (MatrixN::<T, D>::identity() - &gain * &self.models.obs) * &self.state.cov;
+            &self.state.mean + (&gain * (obs - (&self.model.obs * &self.state.mean)));
+        self.state.cov = (MatrixN::<T, D>::identity() - &gain * &self.model.obs) * &self.state.cov;
     }
 
 }

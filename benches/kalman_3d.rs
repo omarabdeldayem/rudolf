@@ -3,7 +3,7 @@ extern crate rudolf;
 
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
 use na::{MatrixMN, Vector3, U3};
-use rudolf::core::{Filter, Models, Noise, State};
+use rudolf::core::{Filter, Model, Noise, State};
 use rudolf::filters::kalman::KalmanFilter;
 
 pub fn bench_kalman_predict_f32_3d(c: &mut Criterion) {
@@ -12,7 +12,7 @@ pub fn bench_kalman_predict_f32_3d(c: &mut Criterion) {
             mean: Vector3::from_element(2.0),
             cov: MatrixMN::<f32, U3, U3>::identity(),
         },
-        models: Models::<f32, U3> {
+        model: Model::<f32, U3> {
             obs: MatrixMN::<f32, U3, U3>::identity(),
             ctrl: MatrixMN::<f32, U3, U3>::identity(),
         },
@@ -35,7 +35,7 @@ pub fn bench_kalman_update_f32_3d(c: &mut Criterion) {
             mean: Vector3::from_element(2.0),
             cov: MatrixMN::<f32, U3, U3>::identity(),
         },
-        models: Models::<f32, U3> {
+        model: Model::<f32, U3> {
             obs: MatrixMN::<f32, U3, U3>::identity(),
             ctrl: MatrixMN::<f32, U3, U3>::identity(),
         },

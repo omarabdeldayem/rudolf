@@ -26,7 +26,7 @@ where
 }
 
 #[derive(Debug)]
-pub struct Models<T, D>
+pub struct Model<T, D>
 where
     T: RealField,
     D: Dim + DimName,
@@ -34,6 +34,17 @@ where
 {
     pub obs: MatrixN<T, D>,
     pub ctrl: MatrixN<T, D>,
+}
+
+#[derive(Debug)]
+pub struct NonlinModel<T, D>
+where
+    T: RealField,
+    D: Dim + DimName,
+    DefaultAllocator: Allocator<T, D> + Allocator<T, D, D>,
+{
+    pub obs: fn(VectorN<T, D>, T) -> VectorN<T, D>,
+    pub ctrl: fn(VectorN<T, D>) -> MatrixN<T, D>
 }
 
 pub trait Filter<T, D>
