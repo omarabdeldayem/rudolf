@@ -11,7 +11,8 @@ where
     DSigma: Dim + DimName,
     DefaultAllocator: Allocator<T, DSigma> + Allocator<T, DSigma, DState>,
 {
-    pub weights: VectorN<T, DSigma>,
+    pub mean_weights: VectorN<T, DSigma>,
+    pub cov_weights: VectorN<T, DSigma>,
     pub sigmas: MatrixMN<T, DSigma, DState>,
 }
 
@@ -30,7 +31,6 @@ where
         mean: &VectorN<T, DState>,
         cov: &MatrixN<T, DState>,
     ) -> SigmaPoints<T, DState, DSigma>;
-    fn generate_weights(&self);
 }
 
 pub struct SimplexGenerator<T>
@@ -85,7 +85,7 @@ where
 
 impl<T, DState, DSigma> SigmaPointGenerator<T, DState, DSigma> for MerweGenerator<T>
 where
-    T: RealField,
+    T: RealField + num::NumCast,
     DState: Dim + DimName,
     DSigma: Dim + DimName,
     DefaultAllocator: Allocator<T, DState>
@@ -93,7 +93,11 @@ where
         + Allocator<T, DSigma, DState>
         + Allocator<T, DSigma>,
 {
-    fn generate_sigmas(&self, mean: &VectorN<T, DState>, cov: &MatrixN<T, DState>) -> SigmaPoints<T, DState, DSigma> {
+    fn generate_sigmas(
+        &self,
+        mean: &VectorN<T, DState>,
+        cov: &MatrixN<T, DState>,
+    ) -> SigmaPoints<T, DState, DSigma> {
         let lambda = (self.alpha * self.alpha) * (self.dim + self.kappa) - self.dim;
         let scaled_cov = cov.scale(self.dim + lambda);
         let sqrt_cov = Cholesky::<T, DState>::new(scaled_cov).unwrap().unpack();
@@ -111,13 +115,20 @@ where
             slice -= sqrt_cov.row(i - mean.len());
         }
 
-        let weights = VectorN::<T, DSigma>::zeros();
+        let weight_sf = num::traits::cast::<u8, T>(1).unwrap()
+            / (num::traits::cast::<u8, T>(2).unwrap() * (self.dim + lambda));
+        let mut mean_weights = VectorN::<T, DSigma>::from_element(weight_sf);
+        let mut cov_weights = VectorN::<T, DSigma>::from_element(weight_sf);
+
+        mean_weights[0] = lambda / (self.dim + lambda);
+        cov_weights[0] = (lambda / (self.dim + lambda)) - (self.alpha * self.alpha)
+            + self.beta
+            + num::traits::cast(1).unwrap();
 
         SigmaPoints::<T, DState, DSigma> {
-            weights: weights,
+            mean_weights: mean_weights,
+            cov_weights: cov_weights,
             sigmas: sigmas,
         }
     }
-
-    fn generate_weights(&self) {}
 }

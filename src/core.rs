@@ -44,7 +44,7 @@ where
     DefaultAllocator: Allocator<T, D> + Allocator<T, D, D>,
 {
     pub obs: fn(VectorN<T, D>, T) -> VectorN<T, D>,
-    pub ctrl: fn(VectorN<T, D>) -> MatrixN<T, D>
+    pub ctrl: fn(VectorN<T, D>) -> MatrixN<T, D>,
 }
 
 pub trait Filter<T, D>
