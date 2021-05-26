@@ -1,58 +1,47 @@
 extern crate nalgebra as na;
 
-use na::allocator::Allocator;
-use na::{DefaultAllocator, Dim, DimName, MatrixN, RealField, VectorN};
+use na::{RealField, SMatrix, SVector};
 
 #[derive(Debug)]
-pub struct State<T, D>
+pub struct State<T, const D: usize>
 where
     T: RealField,
-    D: Dim + DimName,
-    DefaultAllocator: Allocator<T, D> + Allocator<T, D, D>,
 {
-    pub mean: VectorN<T, D>,
-    pub cov: MatrixN<T, D>,
+    pub mean: SVector<T, D>,
+    pub cov: SMatrix<T, D, D>,
 }
 
 #[derive(Debug)]
-pub struct Noise<T, D>
+pub struct Noise<T, const D: usize>
 where
     T: RealField,
-    D: Dim + DimName,
-    DefaultAllocator: Allocator<T, D> + Allocator<T, D, D>,
 {
-    pub obs: MatrixN<T, D>,
-    pub ctrl: MatrixN<T, D>,
+    pub obs: SMatrix<T, D, D>,
+    pub ctrl: SMatrix<T, D, D>,
 }
 
 #[derive(Debug)]
-pub struct Model<T, D>
+pub struct Model<T, const D: usize>
 where
     T: RealField,
-    D: Dim + DimName,
-    DefaultAllocator: Allocator<T, D> + Allocator<T, D, D>,
 {
-    pub obs: MatrixN<T, D>,
-    pub ctrl: MatrixN<T, D>,
+    pub obs: SMatrix<T, D, D>,
+    pub ctrl: SMatrix<T, D, D>,
 }
 
 #[derive(Debug)]
-pub struct NonlinModel<T, D>
+pub struct NonlinModel<T, const D: usize>
 where
     T: RealField,
-    D: Dim + DimName,
-    DefaultAllocator: Allocator<T, D> + Allocator<T, D, D>,
 {
-    pub obs: fn(VectorN<T, D>, T) -> VectorN<T, D>,
-    pub ctrl: fn(VectorN<T, D>) -> MatrixN<T, D>,
+    pub obs: fn(SVector<T, D>, T) -> SVector<T, D>,
+    pub ctrl: fn(SVector<T, D>) -> SMatrix<T, D, D>,
 }
 
-pub trait Filter<T, D>
+pub trait Filter<T, const D: usize>
 where
     T: RealField,
-    D: Dim + DimName,
-    DefaultAllocator: Allocator<T, D>,
 {
-    fn predict(&mut self, obs: &VectorN<T, D>);
-    fn update(&mut self, ctrl: &VectorN<T, D>);
+    fn predict(&mut self, obs: &SVector<T, D>);
+    fn update(&mut self, ctrl: &SVector<T, D>);
 }
