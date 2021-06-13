@@ -3,32 +3,33 @@ use crate::core::{Filter, Model, Noise, State};
 use na::{RealField, SMatrix, SVector};
 
 #[derive(Debug)]
-pub struct KalmanFilter<T, const D: usize>
+pub struct KalmanFilter<T, const S: usize, const M: usize>
 where
     T: RealField,
 {
-    pub state: State<T, D>,
-    pub model: Model<T, D>,
-    pub noise: Noise<T, D>,
+    pub state: State<T, S>,
+    pub model: Model<T, S, M>,
+    pub noise: Noise<T, S, M>,
 }
 
-impl<T, const D: usize> Filter<T, D> for KalmanFilter<T, D>
+impl<T, const S: usize, const M: usize> Filter<T, S, M> for KalmanFilter<T, S, M>
 where
     T: RealField,
 {
-    fn predict(&mut self, ctrl: &SVector<T, D>) {
-        self.state.mean = (&self.model.obs * &self.state.mean) + (&self.model.ctrl * ctrl);
+    fn predict(&mut self, ctrl: &SVector<T, S>) {
+        self.state.mean = (&self.model.state * &self.state.mean) + (&self.model.ctrl * ctrl);
         self.state.cov =
-            &self.model.obs * &self.state.cov * &self.model.obs.transpose() + &self.noise.ctrl;
+            &self.model.state * &self.state.cov * &self.model.state.transpose() + &self.noise.ctrl;
     }
 
-    fn update(&mut self, obs: &SVector<T, D>) {
+    fn update(&mut self, obs: &SVector<T, M>) {
         let gain = &self.state.cov
-            * &self.model.obs
-            * (&self.model.obs * &self.state.cov * &self.model.obs.transpose() + &self.noise.obs)
+            * &self.model.obs.transpose()
+            * ((&self.model.obs * &self.state.cov * &self.model.obs.transpose() + &self.noise.obs)
                 .try_inverse()
-                .unwrap();
+                .unwrap());
         self.state.mean = &self.state.mean + (&gain * (obs - (&self.model.obs * &self.state.mean)));
-        self.state.cov = (SMatrix::<T, D, D>::identity() - &gain * &self.model.obs) * &self.state.cov;
+        self.state.cov =
+            (SMatrix::<T, S, S>::identity() - &gain * &self.model.obs) * &self.state.cov;
     }
 }
