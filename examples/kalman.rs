@@ -11,7 +11,7 @@ use rand::SeedableRng;
 use rand_distr::{Distribution, Normal};
 use rand_xorshift::XorShiftRng;
 
-const OUT_FILE_NAME: &'static str = "./examples/kalman2D.png";
+const OUT_FILE_NAME: &'static str = "./examples/kalman_f32s3o3.png";
 
 fn gen_noisey_linear() -> Vec<(f64, f64)> {
     let norm_dist = Normal::new(0.0, 1.0).unwrap();

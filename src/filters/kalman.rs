@@ -3,16 +3,16 @@ use crate::core::{Filter, Model, Noise, State};
 use na::{RealField, SMatrix, SVector};
 
 #[derive(Debug)]
-pub struct KalmanFilter<T, const S: usize, const M: usize>
+pub struct KalmanFilter<T, const S: usize, const O: usize>
 where
     T: RealField,
 {
     pub state: State<T, S>,
-    pub model: Model<T, S, M>,
-    pub noise: Noise<T, S, M>,
+    pub model: Model<T, S, O>,
+    pub noise: Noise<T, S, O>,
 }
 
-impl<T, const S: usize, const M: usize> Filter<T, S, M> for KalmanFilter<T, S, M>
+impl<T, const S: usize, const O: usize> Filter<T, S, O> for KalmanFilter<T, S, O>
 where
     T: RealField,
 {
@@ -22,7 +22,7 @@ where
             &self.model.state * &self.state.cov * &self.model.state.transpose() + &self.noise.ctrl;
     }
 
-    fn update(&mut self, obs: &SVector<T, M>) {
+    fn update(&mut self, obs: &SVector<T, O>) {
         let gain = &self.state.cov
             * &self.model.obs.transpose()
             * ((&self.model.obs * &self.state.cov * &self.model.obs.transpose() + &self.noise.obs)
