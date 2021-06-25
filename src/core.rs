@@ -31,12 +31,13 @@ where
 }
 
 #[derive(Debug)]
-pub struct NonlinModel<T, const D: usize>
+pub struct NonLinearModel<T, const S: usize, const O: usize>
 where
     T: RealField,
 {
-    pub ctrl: fn(SVector<T, D>) -> SMatrix<T, D, D>,
-    pub obs: fn(SVector<T, D>, T) -> SVector<T, D>,
+    pub state: fn(SVector<T, S>, T) -> SVector<T, S>,
+    pub ctrl: fn(SVector<T, S>, T) -> SVector<T, S>,
+    pub obs: fn(SVector<T, O>, T) -> SVector<T, O>,
 }
 
 pub trait Filter<T, const S: usize, const O: usize>
@@ -46,3 +47,25 @@ where
     fn predict(&mut self, ctrl: &SVector<T, S>);
     fn update(&mut self, obs: &SVector<T, O>);
 }
+
+#[derive(Debug)]
+pub struct SigmaPoints<T, const S: usize, const N: usize>
+where
+    T: RealField,
+{
+    pub mean_weights: SVector<T, N>,
+    pub cov_weights: SVector<T, N>,
+    pub sigmas: SMatrix<T, N, S>,
+}
+
+pub trait SigmaPointGenerator<T, const S: usize, const N: usize>
+where
+    T: RealField,
+{
+    fn generate_sigmas(
+        &self,
+        mean: &SVector<T, S>,
+        cov: &SMatrix<T, S, S>,
+    ) -> SigmaPoints<T, S, N>;
+}
+

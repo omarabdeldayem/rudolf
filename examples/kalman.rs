@@ -43,7 +43,8 @@ fn plot(raw: Vec<(f64, f64)>, filtered: Vec<(f64, f64)>) -> Result<(), Box<dyn s
             raw.iter()
                 .map(|(x, y)| Circle::new((*x, *y), 3, BLUE.filled())),
         )?
-        .label("Measurement");
+        .label("Measurement")
+        .legend(|(x, y)| Circle::new((x, y), 3, BLUE.filled()));
 
     chart
         .draw_series(LineSeries::new(filtered, &BLUE))?
@@ -69,14 +70,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         },
         model: Model::<f32, 4, 2> {
             state: Matrix4::new(
-                1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0,
+                1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0,
             ),
             ctrl: Matrix4::identity(),
             obs: Matrix2x4::new(1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0),
         },
         noise: Noise::<f32, 4, 2> {
-            ctrl: Matrix4::identity() * 100.0,
-            obs: Matrix2::identity() * 100.0,
+            ctrl: Matrix4::identity(),
+            obs: Matrix2::identity() * 10.0,
         },
     };
 
