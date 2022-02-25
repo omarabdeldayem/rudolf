@@ -1,8 +1,5 @@
-extern crate nalgebra as na;
-extern crate rudolf;
-
-use na::{Matrix2, Matrix2x4, Matrix4, Vector2, Vector4};
-use rudolf::core::{Filter, Model, Noise, State};
+use nalgebra::{Matrix2, Matrix2x4, Matrix4, Vector2, Vector4};
+use rudolf::base::{Filter, Model, Noise, State};
 use rudolf::filters::kalman::KalmanFilter;
 
 use plotters::prelude::*;
@@ -63,11 +60,11 @@ fn plot(raw: Vec<(f64, f64)>, filtered: Vec<(f64, f64)>) -> Result<(), Box<dyn s
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let mut filter = KalmanFilter::<f32, 4, 2> {
-        state: State::<f32, 4> {
-            mean: Vector4::new(0.0, 0.0, 0.0, 0.0),
-            cov: Matrix4::zeros(),
-        },
+    let mut state = State::<f32, 4> {
+        mean: Vector4::new(0.0, 0.0, 0.0, 0.0),
+        cov: Matrix4::zeros(),
+    };
+    let filter = KalmanFilter::<f32, 4, 2> {
         model: Model::<f32, 4, 2> {
             state: Matrix4::new(
                 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0,
@@ -85,9 +82,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let filtered: Vec<(f64, f64)> = raw
         .iter()
         .map(|(x, y)| {
-            filter.predict(&Vector4::zeros());
-            filter.update(&Vector2::new(*x as f32, *y as f32));
-            (filter.state.mean.x as f64, filter.state.mean.y as f64)
+            state = filter.predict(&state, &Vector4::zeros());
+            state = filter.update(&state, &Vector2::new(*x as f32, *y as f32));
+            (state.mean.x as f64, state.mean.y as f64)
         })
         .collect();
 

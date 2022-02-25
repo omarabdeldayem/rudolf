@@ -2,7 +2,7 @@
 name = "rudolf"
 version = "0.1.0"
 authors = ["Omar Abdeldayem <omar.abdeldayem@outlook.com>"]
-edition = "2018"
+edition = "2021"
 
 
 [dependencies]

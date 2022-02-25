@@ -1,6 +1,4 @@
-extern crate nalgebra as na;
-
-use na::{RealField, SMatrix, SVector};
+use nalgebra::{RealField, SMatrix, SVector};
 
 #[derive(Debug)]
 pub struct State<T, const S: usize>
@@ -44,8 +42,8 @@ pub trait Filter<T, const S: usize, const O: usize>
 where
     T: RealField,
 {
-    fn predict(&mut self, ctrl: &SVector<T, S>);
-    fn update(&mut self, obs: &SVector<T, O>);
+    fn predict(&self, state: &State<T, S>, ctrl: &SVector<T, S>) -> State<T, S>;
+    fn update(&self, state: &State<T, S>, obs: &SVector<T, O>) -> State<T, S>;
 }
 
 #[derive(Debug)]
@@ -62,10 +60,6 @@ pub trait SigmaPointGenerator<T, const S: usize, const N: usize>
 where
     T: RealField,
 {
-    fn generate_sigmas(
-        &self,
-        mean: &SVector<T, S>,
-        cov: &SMatrix<T, S, S>,
-    ) -> SigmaPoints<T, S, N>;
+    fn generate_sigmas(&self, mean: &SVector<T, S>, cov: &SMatrix<T, S, S>)
+        -> SigmaPoints<T, S, N>;
 }
-

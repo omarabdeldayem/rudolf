@@ -1,5 +1,10 @@
-extern crate nalgebra as na;
+/*!
+# rudolf
+**rudolf**
+*/
 
-pub mod core;
+#![no_std]
+
+pub mod base;
 pub mod filters;
 pub mod generators;
