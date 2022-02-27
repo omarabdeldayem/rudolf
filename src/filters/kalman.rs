@@ -6,7 +6,6 @@ pub struct KalmanFilter<T, const S: usize, const O: usize>
 where
     T: RealField,
 {
-    // pub state: State<T, S>,
     pub model: Model<T, S, O>,
     pub noise: Noise<T, S, O>,
 }
@@ -28,7 +27,10 @@ where
                 .try_inverse()
                 .unwrap());
         let mean = state.mean + (&gain * (obs - (&self.model.obs * state.mean)));
-        let cov = (SMatrix::<T, S, S>::identity() - &gain * &self.model.obs) * state.cov;
+        let cov = (SMatrix::<T, S, S>::identity() - &gain * &self.model.obs)
+            * state.cov
+            * (SMatrix::<T, S, S>::identity() - &gain * &self.model.obs).transpose()
+            + &gain * self.noise.obs * &gain.transpose();
         State { mean, cov }
     }
 }
