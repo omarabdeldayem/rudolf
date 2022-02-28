@@ -15,7 +15,7 @@ impl<T, const S: usize, const O: usize> AlphaBetaFilter<T, S, O>
 where
     T: RealField,
 {
-    fn new(alpha: T, beta: T, time_step: T, model: Model<T, S, O>) -> AlphaBetaFilter<T, S, O> {
+    pub fn new(alpha: T, beta: T, time_step: T, model: Model<T, S, O>) -> AlphaBetaFilter<T, S, O> {
         AlphaBetaFilter {
             alpha,
             beta,
