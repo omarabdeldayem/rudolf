@@ -1,7 +1,7 @@
 [package]
 name = "rudolf"
-version = "0.1.0"
-authors = ["Omar Abdeldayem <omar.abdeldayem@outlook.com>"]
+version = "0.0.1"
+authors = ["Omar Abdeldayem <o.a.abdeldayem@gmail.com>"]
 edition = "2021"
 
 
