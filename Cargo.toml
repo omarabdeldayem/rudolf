@@ -3,6 +3,12 @@ name = "rudolf"
 version = "0.0.1"
 authors = ["Omar Abdeldayem <o.a.abdeldayem@gmail.com>"]
 edition = "2021"
+description = "Filters for embedded devices"
+readme = "README.md"
+license-file = "LICENSE"
+keywords = ["kalman", "filter", "embedded"]
+categoris = ["science::robotics", "embedded"]
+repository = "https://github.com/omarabdeldayem/rudolf/"
 
 
 [dependencies]
