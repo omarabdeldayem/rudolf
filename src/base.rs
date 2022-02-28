@@ -42,8 +42,8 @@ pub trait Filter<T, const S: usize, const O: usize>
 where
     T: RealField,
 {
-    fn predict(&self, state: &State<T, S>, ctrl: &SVector<T, S>) -> State<T, S>;
-    fn update(&self, state: &State<T, S>, obs: &SVector<T, O>) -> State<T, S>;
+    fn predict(&mut self, state: &State<T, S>, ctrl: &SVector<T, S>) -> State<T, S>;
+    fn update(&mut self, state: &State<T, S>, obs: &SVector<T, O>) -> State<T, S>;
 }
 
 #[derive(Debug)]

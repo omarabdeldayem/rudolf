@@ -14,23 +14,23 @@ impl<T, const S: usize, const O: usize> Filter<T, S, O> for KalmanFilter<T, S, O
 where
     T: RealField,
 {
-    fn predict(&self, state: &State<T, S>, ctrl: &SVector<T, S>) -> State<T, S> {
-        let mean = (&self.model.state * state.mean) + (&self.model.ctrl * ctrl);
-        let cov = &self.model.state * state.cov * &self.model.state.transpose() + &self.noise.ctrl;
+    fn predict(&mut self, state: &State<T, S>, ctrl: &SVector<T, S>) -> State<T, S> {
+        let mean = (self.model.state * state.mean) + (self.model.ctrl * ctrl);
+        let cov = self.model.state * state.cov * self.model.state.transpose() + self.noise.ctrl;
         State { mean, cov }
     }
 
-    fn update(&self, state: &State<T, S>, obs: &SVector<T, O>) -> State<T, S> {
+    fn update(&mut self, state: &State<T, S>, obs: &SVector<T, O>) -> State<T, S> {
         let gain = state.cov
-            * &self.model.obs.transpose()
-            * ((&self.model.obs * state.cov * &self.model.obs.transpose() + &self.noise.obs)
+            * self.model.obs.transpose()
+            * ((self.model.obs * state.cov * self.model.obs.transpose() + self.noise.obs)
                 .try_inverse()
                 .unwrap());
-        let mean = state.mean + (&gain * (obs - (&self.model.obs * state.mean)));
+        let mean = state.mean + (gain * (obs - (self.model.obs * state.mean)));
         let cov = (SMatrix::<T, S, S>::identity() - &gain * &self.model.obs)
             * state.cov
-            * (SMatrix::<T, S, S>::identity() - &gain * &self.model.obs).transpose()
-            + &gain * self.noise.obs * &gain.transpose();
+            * (SMatrix::<T, S, S>::identity() - gain * self.model.obs).transpose()
+            + gain * self.noise.obs * gain.transpose();
         State { mean, cov }
     }
 }
