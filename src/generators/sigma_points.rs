@@ -1,6 +1,5 @@
-extern crate nalgebra as na;
-use crate::core::{SigmaPoints, SigmaPointGenerator};
-use na::{RealField, SMatrix, SVector};
+use crate::base::{SigmaPointGenerator, SigmaPoints};
+use nalgebra::{RealField, SMatrix, SVector};
 
 pub struct SimplexGenerator<T>
 where
@@ -26,8 +25,7 @@ where
     pub dim: T,
 }
 
-impl<T, const S: usize, const N: usize> SigmaPointGenerator<T, S, N>
-    for MerweGenerator<T, S, N>
+impl<T, const S: usize, const N: usize> SigmaPointGenerator<T, S, N> for MerweGenerator<T, S, N>
 where
     T: RealField + num::NumCast,
 {
@@ -41,13 +39,11 @@ where
         let sqrt_cov = scaled_cov.cholesky().unwrap().unpack();
         let mut sigmas = SMatrix::<T, N, S>::from_row_slice(mean.as_slice());
 
-        //
         for i in 1..mean.len() {
             let mut slice = sigmas.row_mut(i);
             slice += sqrt_cov.row(i - 1);
         }
 
-        //
         for i in mean.len()..sigmas.nrows() {
             let mut slice = sigmas.row_mut(i);
             slice -= sqrt_cov.row(i - mean.len());
@@ -64,9 +60,9 @@ where
             + num::traits::cast(1).unwrap();
 
         SigmaPoints::<T, S, N> {
-            mean_weights: mean_weights,
-            cov_weights: cov_weights,
-            sigmas: sigmas,
+            mean_weights,
+            cov_weights,
+            sigmas,
         }
     }
 }
